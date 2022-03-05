@@ -127,6 +127,11 @@ const userSchema = new Schema({
         type: Boolean,
         required: true
     },
+    //in my app whether this is true or not determines if it is rendered on the saved page- how would I just change this data for the user logged in and not just the data of the entire app
+    isSaved: {
+        type: Boolean,
+        required: true
+    },
     room: [roomSchema]
 }, {
     timestamps: true

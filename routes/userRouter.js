@@ -1,25 +1,41 @@
 const express = require('express');
+const User = require('../models/user');
 const userRouter = express.Router();
 
 //this will go through all of the users and send user info depending on id that is logged in
 
 userRouter.route('/')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
+.get((req, res, next) => {
+    User.find()
+    .then(users => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(users);
+    })
+    .catch(err => next(err)); //handles errors
 })
-.get((req, res) => {
-    res.end('Will send user info');
+.post((req, res, next) => { //would this be where if a user created an account it would be posted to the data?
+    User.create(req.body)
+    .then(user => {
+        console.log('User Created ', user);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user); //sends info about posted document to client
+    })
+    .catch(err => next(err));
 })
-.post((req, res) => {
-    res.end(`Will add user info`);
+.put((req, res) => { //is this where I would allow the user to edit the isSaved field of data? or would that be in the id area?
+    res.statusCode = 403;
+    res.end('PUT operation not supported on /user');
 })
-.put((req, res) => {
-    res.end('will edit user info');
-})
-.delete((req, res) => {
-    res.end('will delete user info');
+.delete((req, res, next) => {
+    User.deleteMany()
+    .then(response => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
+    })
+    .catch(err => next(err));
 });
 
 userRouter.route('/:sellUserId')
