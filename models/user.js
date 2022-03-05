@@ -122,6 +122,11 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    //would I need this boolean to indicate if they are a room seller or not?
+    roomSeller: {
+        type: Boolean,
+        required: true
+    },
     room: [roomSchema]
 }, {
     timestamps: true
