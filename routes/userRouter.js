@@ -22,7 +22,7 @@ userRouter.route('/')
     res.end('will delete user info');
 });
 
-userRouter.route('/:userId')
+userRouter.route('/:sellUserId')
 .all((req, res, next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
