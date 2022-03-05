@@ -38,23 +38,40 @@ userRouter.route('/')
     .catch(err => next(err));
 });
 
-userRouter.route('/:sellUserId')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
+//connecting to specified id within a document
+userRouter.route('/:userId')
+.get((req, res, next) => {
+    User.findById(req.params.userId)
+    .then(user => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    })
+    .catch(err => next(err));
 })
-.get((req, res) => {
-    res.end(`will send user ${req.params.userId} to you`);
+.post((req, res) => { //would I need post for indv user id?
+    res.statusCode = 403;
+    res.end(`POST operation not supported on /user/${req.params.userId}`);
 })
-.post((req, res) => {
-    res.end(`will add user ${req.params.userId}`);
+.put((req, res, next) => {
+    User.findByIdAndUpdate(req.params.userId, { //or is this where I would update isSaved for specific id
+        $set: req.body
+    }, { new: true })
+    .then(user => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    })
+    .catch(err => next(err));
 })
-.put((req, res) => {
-    res.end(`Will update user ${req.params.userId}`);
-})
-.delete((req, res) => {
-    res.end(`Deleting user: ${req.params.userId}`);
+.delete((req, res, next) => {
+    User.findByIdAndDelete(req.params.userId)
+    .then(response => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
+    })
+    .catch(err => next(err));
 });
 
 module.exports = userRouter;
