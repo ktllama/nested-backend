@@ -14,7 +14,7 @@ userRouter.route('/')
     })
     .catch(err => next(err)); //handles errors
 })
-.post((req, res, next) => { //would this be where if a user created an account it would be posted to the data?
+.post((req, res, next) => { //this is where a user creating an account would post
     User.create(req.body)
     .then(user => {
         console.log('User Created ', user);
@@ -24,7 +24,7 @@ userRouter.route('/')
     })
     .catch(err => next(err));
 })
-.put((req, res) => { //is this where I would allow the user to edit the isSaved field of data? or would that be in the id area?
+.put((req, res) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /user');
 })
@@ -43,10 +43,15 @@ userRouter.route('/:userId')
 .get((req, res, next) => {
     User.findById(req.params.userId)
     .then(user => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(user);
+        User.find({userId: {$in: user.savedRooms}})
+        .then(users => {
+            user.savedRoomsDetails = users;
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(user);
+        })
     })
+    //this query now will find the user thats logged in data as well as the data for all of the users of the rooms they saved
     .catch(err => next(err));
 })
 .post((req, res) => { //would I need post for indv user id?
@@ -54,7 +59,7 @@ userRouter.route('/:userId')
     res.end(`POST operation not supported on /user/${req.params.userId}`);
 })
 .put((req, res, next) => {
-    User.findByIdAndUpdate(req.params.userId, { //or is this where I would update isSaved for specific id
+    User.findByIdAndUpdate(req.params.userId, { //edit profile and saved rooms
         $set: req.body
     }, { new: true })
     .then(user => {
